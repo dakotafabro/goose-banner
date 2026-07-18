@@ -16,7 +16,7 @@ thread_count=${#thread_files[@]}
 
 machine="${AGENT_MACHINE:-$(cat ~/.agent-machine 2>/dev/null || hostname)}"
 
-printf '  🍄 %d thread(s) | %s\n' "$thread_count" "$machine"
+printf '  🍄 %d thread(s) active | %s\n' "$thread_count" "$machine"
 
 for thread_file in "${thread_files[@]}"; do
   name=$(grep "^thread_name:" "$thread_file" 2>/dev/null | sed 's/^thread_name: *//' | sed "s/^['\"]//;s/['\"]$//" || echo "?")
@@ -26,8 +26,9 @@ for thread_file in "${thread_files[@]}"; do
   marker=""
   [ -n "$origin" ] && [ "$origin" != "$machine" ] && marker=" <- ${origin}"
 
-  task_short="${task:0:45}"
-  [ ${#task} -gt 45 ] && task_short="${task_short}..."
+  task_short="${task:0:60}"
+  [ ${#task} -gt 60 ] && task_short="${task_short}..."
 
-  printf '  🍄  * %s%s\n' "$name" "$marker"
+  printf '  🍄  %s%s\n' "$name" "$marker"
+  [ -n "$task_short" ] && printf '  🍄    ↳ %s\n' "$task_short"
 done
