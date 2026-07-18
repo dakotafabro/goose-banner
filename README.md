@@ -5,17 +5,23 @@ Customizable session startup banner for [Goose](https://github.com/block/goose).
 ## What it looks like
 
 ```
-  🌱 spore: 2026-07-18-a3f2c1
-  🍄 5 thread(s) | work
-  🍄  * goose-banner-plugin
-  🍄  * hyphae-build
-  🍄  * patent-candidates
+  🌱 spore | 120 sessions | 8.3M tokens | 47 retrievals
+  🌱 today | 6 sessions | 180k tokens
+  🍄 3 thread(s) active | work
+  🍄  api-refactor
+  🍄    ↳ Migrate v1 endpoints to new response format
+  🍄  onboarding-flow
+  🍄    ↳ Add email verification step before account creation
+  🍄  perf-investigation
+  🍄    ↳ Dashboard load time regression after deploy #847
 
     __( O)>  ● resuming · databricks goose-claude-4-6-opus
-   \____)    20260718_14 · /Users/dakota
+   \____)    20260718_15 · /Users/you
      L L     goose is ready
   ━╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌ 5% 45k/1.0M
 ```
+
+The 🌱 lines come from [spore](https://github.com/dakotafabro/spore) (biomimetic agent memory) and the 🍄 lines come from [hyphae](https://github.com/dakotafabro/hyphae) (session continuity across machines). Both are in development and scheduled for public release by end of August 2026. You can write your own banner scripts for any context you want to surface.
 
 ## How it works
 
@@ -55,46 +61,111 @@ A [draft PR](https://github.com/block/goose/pull/10562) adds native `SessionBann
    mkdir -p ~/.config/goose/banner.d
    ```
 
-2. Drop executable scripts in `banner.d/`:
+2. Add the shell wrapper to your `~/.zshrc` (see Path 1 above)
+
+3. Drop executable scripts in `banner.d/` (see Customizing below, or use an example):
    ```bash
    cp examples/01-git-status.sh ~/.config/goose/banner.d/
    chmod +x ~/.config/goose/banner.d/01-git-status.sh
    ```
 
-3. Add the shell wrapper to your `~/.zshrc` (see above)
-
-4. (Optional) Enable agent visibility:
+4. (Optional) Enable agent visibility so the agent also sees your banner:
    ```bash
    echo 'export GOOSE_MOIM_MESSAGE_FILE="$HOME/.goose-session-banner.txt"' >> ~/.zshrc
    ```
    Then enable the `tom` extension in `~/.config/goose/config.yaml`.
 
-## Writing banner scripts
+## Customizing your banner
 
-Scripts are executed in sort order (use numeric prefixes: `01-`, `02-`, etc.). Each script's stdout becomes banner lines.
+The banner is yours to make useful. Write any bash script that prints what you need to see at session start. Here's how:
 
-Rules:
-- Must be executable (`chmod +x`)
-- Empty stdout = silently skipped
-- Keep it fast (runs before every session)
-- Prefix lines with `  ` (two spaces) to align with Goose's banner
-- Use emoji for visual scanning
+### Create a script
 
 ```bash
 #!/usr/bin/env bash
-# 01-hello.sh
-printf '  👋 hello from banner\n'
+# ~/.config/goose/banner.d/01-my-banner.sh
+
+# Print whatever context helps you orient
+printf '  🔥 3 PRs waiting for review\n'
+printf '  📅 standup in 45 min\n'
 ```
 
-## Examples
+Make it executable:
+```bash
+chmod +x ~/.config/goose/banner.d/01-my-banner.sh
+```
+
+That's it. Next time you run `goose session`, those lines appear before the goose art.
+
+### Script rules
+
+- **Executable** - must have `chmod +x`
+- **Sort order** - scripts run in filename order (use `01-`, `02-`, `03-` prefixes)
+- **Fast** - runs before every session, keep it under 1-2 seconds
+- **Stdout only** - print to stdout, stderr is suppressed
+- **Silent fail** - if a script produces no output, it's skipped
+- **Indent with 2 spaces** - aligns with Goose's own banner formatting
+
+### Ideas for your banner
+
+| What to show | How |
+|---|---|
+| Git branch + dirty files | `git branch --show-current`, `git status --short \| wc -l` |
+| Today's calendar | Query your calendar API or a local cache |
+| Open PRs needing review | `gh pr list --search "review-requested:@me"` |
+| Reminders / TODOs | Read from a text file (`~/.reminders.txt`) |
+| Active Linear tickets | `curl` the Linear API or use a cached export |
+| Pomodoro / focus timer | Check a timer state file |
+| Weather | `curl wttr.in/?format=3` |
+| Disk space warning | `df -h / \| awk 'NR==2{print $5}'` |
+| Docker containers running | `docker ps --format '{{.Names}}' \| wc -l` |
+| Session stats from a DB | `sqlite3 ~/.local/share/goose/sessions/sessions.db "SELECT ..."` |
+
+### Example: PR review reminder
+
+```bash
+#!/usr/bin/env bash
+# ~/.config/goose/banner.d/01-prs.sh
+count=$(gh pr list --search "review-requested:@me" --json number --jq length 2>/dev/null)
+[ "${count:-0}" -gt 0 ] && printf '  👀 %d PR(s) waiting for your review\n' "$count"
+```
+
+### Example: simple reminders file
+
+```bash
+#!/usr/bin/env bash
+# ~/.config/goose/banner.d/02-reminders.sh
+file="$HOME/.reminders.txt"
+[ -f "$file" ] || exit 0
+count=$(wc -l < "$file" | tr -d ' ')
+[ "$count" -eq 0 ] && exit 0
+printf '  📝 %d reminder(s)\n' "$count"
+while IFS= read -r line; do
+  printf '  📝   %s\n' "$line"
+done < "$file"
+```
+
+### Example: current git context
+
+```bash
+#!/usr/bin/env bash
+# ~/.config/goose/banner.d/03-git.sh
+branch=$(git branch --show-current 2>/dev/null) || exit 0
+dirty=$(git status --short 2>/dev/null | wc -l | tr -d ' ')
+printf '  🌿 %s' "$branch"
+[ "$dirty" -gt 0 ] && printf ' (%d uncommitted)' "$dirty"
+printf '\n'
+```
+
+## Included examples
 
 | Script | What it shows |
 |---|---|
 | `01-git-status.sh` | Current branch, dirty file count, commits ahead |
-| `01-spore.sh` | Spore session ID |
-| `02-hyphae.sh` | Active work threads from hyphae |
+| `01-spore.sh` | Session stats from agent memory system |
+| `02-hyphae.sh` | Active work threads with descriptions |
 | `02-reminders.sh` | Lines from a reminders file |
-| `03-time-context.sh` | Day of week and time of day |
+| `03-time-context.sh` | Day of week and time-appropriate greeting |
 
 ## Dual-channel architecture
 
@@ -104,6 +175,8 @@ The banner reaches both the user and the agent:
 |---|---|---|
 | Terminal (stdout) | User | Shell wrapper prints before Goose launches |
 | `~/.goose-session-banner.txt` | Agent | `tom` extension injects into turn context |
+
+This means your banner context is available to the agent on every turn without spending tokens on a tool call.
 
 ## Configuration
 
