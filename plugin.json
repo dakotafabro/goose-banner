@@ -1,0 +1,5 @@
+{
+  "name": "goose-banner",
+  "version": "0.1.0",
+  "description": "Customizable session startup banner. Lets plugins surface context the moment a session opens."
+}
