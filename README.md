@@ -21,7 +21,7 @@ Customizable session startup banner for [Goose](https://github.com/block/goose).
   ━╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌ 5% 45k/1.0M
 ```
 
-The 🌱 lines come from [spore](https://github.com/dakotafabro/spore) (biomimetic agent memory) and the 🍄 lines come from [hyphae](https://github.com/dakotafabro/hyphae) (session continuity across machines). Both are in development and scheduled for public release by end of August 2026. You can write your own banner scripts for any context you want to surface.
+The 🌱 lines come from [spore](https://github.com/dakotafabro/spore) (agent memory and retrieval tracking) and the 🍄 lines come from [hyphae](https://github.com/dakotafabro/hyphae) (session continuity). Both are Goose plugins currently in development, scheduled for public release by end of August 2026. You can write your own banner scripts for any context you want to surface.
 
 ## How it works
 
@@ -162,8 +162,8 @@ printf '\n'
 | Script | What it shows |
 |---|---|
 | `01-git-status.sh` | Current branch, dirty file count, commits ahead |
-| `01-spore.sh` | Session stats from agent memory system |
-| `02-hyphae.sh` | Active work threads with descriptions |
+| `01-spore.sh` | Session and retrieval stats from spore |
+| `02-hyphae.sh` | Active work threads from hyphae |
 | `02-reminders.sh` | Lines from a reminders file |
 | `03-time-context.sh` | Day of week and time-appropriate greeting |
 
@@ -187,4 +187,4 @@ This means your banner context is available to the agent on every turn without s
 
 ## License
 
-MIT
+Apache License 2.0
