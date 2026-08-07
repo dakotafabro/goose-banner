@@ -30,5 +30,5 @@ for thread_file in "${thread_files[@]}"; do
   [ ${#task} -gt 60 ] && task_short="${task_short}..."
 
   printf '  🍄  %s%s\n' "$name" "$marker"
-  [ -n "$task_short" ] && printf '  🍄    ↳ %s\n' "$task_short"
+  [ -n "$task_short" ] && printf '       ↳ %s\n' "$task_short"
 done
