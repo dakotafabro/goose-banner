@@ -34,3 +34,4 @@ fi
 
 printf '  🌱 spore | %s sessions | %s tokens | %d retrievals\n' "$total_sessions" "$total_tokens_k" "$retrievals"
 printf '  🌱 today | %s sessions | %s tokens\n' "$today_sessions" "$today_tokens_k"
+printf '\n'
