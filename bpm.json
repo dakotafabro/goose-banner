@@ -1,11 +1,11 @@
 {
   "name": "goose-banner",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "extension",
   "description": "Customizable session startup banner - drop scripts in banner.d/ to surface context at session open",
   "entry": "plugin.json",
   "scope": "global",
-  "token_cost": 0,
+  "token_cost": 250,
   "keywords": ["banner", "startup", "session", "context", "hooks"],
   "author": {
     "name": "Dakota Fabro",
