@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-repo_root="${SPORE_REPO_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || echo "$HOME/the_professional")}"
-[ -d "$repo_root" ] || repo_root="$HOME/the_professional"
+repo_root="${SPORE_REPO_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || echo "")}"
 
 db="$HOME/.local/share/goose/sessions/sessions.db"
 
