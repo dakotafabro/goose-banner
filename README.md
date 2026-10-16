@@ -69,6 +69,8 @@ A [draft PR](https://github.com/aaif-goose/goose/pull/10562) adds native `Sessio
    chmod +x ~/.config/goose/banner.d/01-git-status.sh
    ```
 
+   The spore and hyphae examples read their repo from `SPORE_REPO_ROOT` and `HYPHAE_REPO_ROOT`, and otherwise use the git repo of the directory Goose starts in. If you start Goose outside that repo, export the variable in `~/.zshrc`.
+
 4. (Optional) Enable agent visibility so the agent also sees your banner:
    ```bash
    echo 'export GOOSE_MOIM_MESSAGE_FILE="$HOME/.goose-session-banner.txt"' >> ~/.zshrc

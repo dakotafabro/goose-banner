@@ -1,10 +1,6 @@
 #!/usr/bin/env bash
 repo_root="${HYPHAE_REPO_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || echo "")}"
 
-if [ -z "$repo_root" ] || [ ! -d "$repo_root/.hyphae/active" ]; then
-  repo_root="$HOME/the_professional"
-fi
-
 hyphae_dir="$repo_root/.hyphae/active"
 
 [ -d "$hyphae_dir" ] || exit 0
